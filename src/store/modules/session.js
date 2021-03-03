@@ -24,6 +24,7 @@ const state = () => ({
   lockedVote: 0,
   votingSpeed: 3000,
   isVoteInProgress: false,
+  enableVoteHistory: false,
   voteHistory: [],
   isRolesDistributed: false
 });
@@ -46,6 +47,7 @@ const mutations = {
   setVotingSpeed: set("votingSpeed"),
   setVoteInProgress: set("isVoteInProgress"),
   claimSeat: set("claimedSeat"),
+  setEnableVoteHistory: set("enableVoteHistory"),
   distributeRoles: set("isRolesDistributed"),
   setSessionId(state, sessionId) {
     state.sessionId = sessionId
@@ -65,12 +67,18 @@ const mutations = {
   },
   /**
    * Create an entry in the vote history log. Requires current player array because it might change later in the game.
+   * Only store history for players if enableVoteHistory is true
    * Only stores votes that were completed.
    * @param state
    * @param players
    */
   addHistory(state, players) {
-    if (!state.nomination || state.lockedVote <= players.length) return;
+    if (
+      !state.nomination ||
+      state.lockedVote <= players.length ||
+      (state.isSpectator && !state.enableVoteHistory)
+    )
+      return;
     const isBanishment = players[state.nomination[1]].role.team === "traveler";
     state.voteHistory.push({
       timestamp: new Date(),
