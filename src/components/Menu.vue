@@ -117,8 +117,15 @@
               Send Characters
               <em><font-awesome-icon icon="theater-masks"/></em>
             </li>
+            <li v-if="!session.isSpectator" @click="toggleEnableVoteHistory">
+              {{ session.enableVoteHistory ? "Disable" : "Enable" }} History
+              <em><font-awesome-icon icon="vote-yea"/></em>
+            </li>
             <li
-              v-if="session.voteHistory.length"
+              v-if="
+                session.voteHistory.length &&
+                  (!session.isSpectator || session.enableVotingHistory)
+              "
               @click="toggleModal('voteHistory')"
             >
               Nomination history<em>[V]</em>
@@ -313,6 +320,10 @@ export default {
       if (confirm("Are you sure you want to remove all player roles?")) {
         this.$store.dispatch("players/clearRoles");
       }
+    },
+    toggleEnableVoteHistory() {
+      if (this.session.isSpectator) return;
+      this.$store.commit("session/toggleEnableVoteHistory");
     },
     ...mapMutations([
       "toggleGrimoire",
