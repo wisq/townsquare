@@ -172,6 +172,10 @@ class LiveSession {
         if (!this._isSpectator) return;
         this._store.commit("session/setVotingSpeed", params);
         break;
+      case "setEnableVoteHistory":
+        if (!this._isSpectator) return;
+        this._store.commit("session/toggleEnableVoteHistory");
+        break;
       case "clearVoteHistory":
         if (!this._isSpectator) return;
         this._store.commit("session/clearVoteHistory");
@@ -655,6 +659,17 @@ class LiveSession {
   }
 
   /**
+   * Set the flag for EnableVoteHistory. ST Only
+   */
+  setEnableVoteHistory() {
+    if (this._isSpectator) return;
+    this._send(
+      "setEnableVoteHistory",
+      this._store.state.session.enableVoteHistory
+    );
+  }
+
+  /**
    * Clear the vote history for everyone. ST only
    */
   clearVoteHistory() {
@@ -811,6 +826,9 @@ export default store => {
         break;
       case "players/update":
         session.sendPlayer(payload);
+        break;
+      case "session/toggleEnableVoteHistory":
+        session.setEnableVoteHistory();
         break;
     }
   });
